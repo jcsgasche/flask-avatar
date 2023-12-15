@@ -10,29 +10,35 @@ socket.on('show_content', function(data) {
     console.log('Received content data from server:', data);
 
     if(data.type === 'image') {
-        showContent(data.url, data.duration, 'image');
+        showContent(data.url, 'image', data.duration);
     } else if(data.type === 'video') {
-        showContent(data.url, data.duration, 'video');
+        showContent(data.url, 'video', data.sound);
     }
 });
 
-function showContent(url, duration, contentType) {
+function showContent(url, contentType, parameter) {
     var contentElement;
 
     if (contentType == 'image') {
         contentElement = new Image();
         contentElement.src = url;
+        setTimeout(function() {
+            document.body.removeChild(contentElement);
+        }, parameter * 1000);
     } else if (contentType == 'video') {
         contentElement = document.createElement('video');
         contentElement.src = url;
         contentElement.autoplay = true;
+        contentElement.muted = !parameter;
+
+        contentElement.onended = function() {
+            document.body.removeChild(contentElement);
+        };
     }
 
     document.body.appendChild(contentElement);
 
-    setTimeout(function() {
-        document.body.removeChild(contentElement);
-    }, duration);
+    
 }
 
 // Load the base URL from the <base> tag
