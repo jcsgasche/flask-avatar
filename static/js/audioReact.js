@@ -1,11 +1,39 @@
 var socket = io.connect('http://127.0.0.1:5000');
 
-socket.on('message', function(data) {
+socket.emit('my event', {data: 'I\'m connected!'});
+
+/* socket.on('message', function(data) {
     console.log('Received message from server:', data);
-    
+}); */
+
+socket.on('show_content', function(data) {
+    console.log('Received content data from server:', data);
+
+    if(data.type === 'image') {
+        showContent(data.url, data.duration, 'image');
+    } else if(data.type === 'video') {
+        showContent(data.url, data.duration, 'video');
+    }
 });
 
-socket.emit('my event', {data: 'I\'m connected!'});
+function showContent(url, duration, contentType) {
+    var contentElement;
+
+    if (contentType == 'image') {
+        contentElement = new Image();
+        contentElement.src = url;
+    } else if (contentType == 'video') {
+        contentElement = document.createElement('video');
+        contentElement.src = url;
+        contentElement.autoplay = true;
+    }
+
+    document.body.appendChild(contentElement);
+
+    setTimeout(function() {
+        document.body.removeChild(contentElement);
+    }, duration);
+}
 
 // Load the base URL from the <base> tag
 const base = document.querySelector('base').getAttribute('href');
